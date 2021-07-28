@@ -229,7 +229,7 @@ async def qrcode(message: types.Message, state: FSMContext):
     import qrcode
     data = await state.get_data()
     event = data.get("event")
-    img = qrcode.make('Мероприятие встреча. 2 человека')
+    img = qrcode.make('event')
     type(img)
     img.save("some_file.png")
     await bot.send_photo(photo="some_file.png", caption="Ваш QR-код", chat_id=message.from_user.id)
