@@ -9,7 +9,7 @@ from filters.ListFilter import ListFilter
 from keyboards.default.confirm_keyboard import confirm
 from keyboards.default.description_keyboard import description_key
 from keyboards.default.question_keyboard import question
-from loader import dp, db
+from loader import dp, db, bot
 
 
 @dp.message_handler(Command("cancel"), state="*")
@@ -203,39 +203,37 @@ async def book_the_tickets(message: types.Message, state: FSMContext):
         if int(amount_to_book) % 10 == 1:
             await message.answer(f"Вы успешно забронировали {amount_to_book} место "
                                  f"на мероприятие: \n"
-                                 f"{event} \n"
-                                 f"Хотите забронировать еще билеты?", reply_markup=question)
+                                 f"{event} \n", reply_markup=question)
+
+            await state.set_state("qr")
         elif (int(amount_to_book) % 10 >= 2) and (int(amount_to_book) % 10 <= 4) \
                 and (int(amount_to_book) // 10 != 1):
             await message.answer(f"Вы успешно забронировали {amount_to_book} места "
                                  f"на мероприятие: \n"
-                                 f"{event} \n"
-                                 f"Хотите забронировать еще билеты?", reply_markup=question)
+                                 f"{event} \n", reply_markup=question)
+            await state.set_state("qr")
+
         else:
             await message.answer(f"Вы успешно забронировали {amount_to_book} мест "
                                  f"на мероприятие: \n"
-                                 f"{event} \n"
-                                 f"Хотите забронировать еще билеты?", reply_markup=question)
-        await state.set_state("qr")
+                                 f"{event} \n", reply_markup=question)
+
+            await state.set_state("qr")
     else:
         await message.answer(f"Пожалуйста, введите корректное количество")
         await state.set_state("amount_got")
 
 
 @dp.message_handler(state="qr")
-def qrcode(message: types.Message, state: FSMContext):
+async def qrcode(message: types.Message, state: FSMContext):
     import qrcode
     data = await state.get_data()
     event = data.get("event")
-    img = qrcode.make(str(event))
+    img = qrcode.make('Мероприятие встреча. 2 человека')
     type(img)
     img.save("some_file.png")
-    bot <- Bot(token= bot_token())
-    bot.sendPhoto(
-        chat_id=message.from_user.id,
-        photo="some_file.png",
-        caption="Ваш QR-код"
-    )
+    await bot.send_photo(photo="some_file.png", caption="Ваш QR-код", chat_id=message.from_user.id)
+
 
 @dp.message_handler(Command("my_orders"))
 async def my_orders(message: types.Message):
@@ -267,4 +265,3 @@ async def my_orders(message: types.Message):
     all_orders = "\n".join(order_list)
     await message.answer(f"""Вы забронировали билеты на следующие события: \n"""
                          f"""{all_orders}""")
-
