@@ -1,3 +1,4 @@
+import datetime
 import sqlite3
 
 
@@ -31,21 +32,26 @@ class Database:
         return data
 
     def get_list_of_events(self):
-        sql = f"SELECT Id, Name FROM Event WHERE True"
+        sql = f"""SELECT Id, Name FROM Event WHERE Date > {int(datetime.datetime.now().strftime("%m%d"))} OR 
+        (Date = {int(datetime.datetime.now().strftime("%m%d"))} AND Time
+         > {int(datetime.datetime.now().strftime("%H%M"))})"""
         return self.execute(sql, fetchall=True)
 
     def select_event(self, id: str):
-        sql = f"SELECT Name, Date, Time, Place FROM Event WHERE Id = {id}"
-        return self.execute(sql, fetchall=True)
+        sql = f"SELECT Name, Date, Time, Place FROM Event WHERE Id = ?"
+        data = id,
+        return self.execute(sql, parameters=data, fetchall=True)
 
     def get_amount_of_places(self, id: str):
-        sql = f"SELECT Capacity FROM Event WHERE Id = {id}"
-        return self.execute(sql, fetchone=True)
+        sql = f"SELECT Capacity FROM Event WHERE Id = ? "
+        data = id,
+        return self.execute(sql, parameters=data, fetchone=True)
 
     def get_handled_places(self, id: str):
-        sql = f"SELECT Quantity FROM Booking WHERE Event = {id}"
+        sql = f"SELECT Quantity FROM Booking WHERE Event = ?"
+        data = id,
         if sql:
-            return self.execute(sql, fetchall=True)
+            return self.execute(sql, parameters=data, fetchall=True)
         else:
             return "0"
 
@@ -58,7 +64,16 @@ class Database:
         sql = f"DELETE FROM Booking WHERE True"
         self.execute(sql, commit=True)
 
-    # def compare_tickets(self, ):
+    def expired_events(self):
+        sql = f"""SELECT Id FROM Event WHERE Date < {int(datetime.datetime.now().strftime("%m%d"))} OR 
+                (Date = {int(datetime.datetime.now().strftime("%m%d"))} AND Time
+                 < {int(datetime.datetime.now().strftime("%H%M"))})"""
+        return self.execute(sql, fetchall=True)
+
+    def my_orders(self, id: str):
+        sql = f"""SELECT Event, Quantity  FROM Booking WHERE User = ?"""
+        parameters = id,
+        return self.execute(sql, parameters=parameters, fetchall=True)
 
 
 def logger(statement):
