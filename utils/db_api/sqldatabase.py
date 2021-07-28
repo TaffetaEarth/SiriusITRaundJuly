@@ -35,7 +35,7 @@ class Database:
         return self.execute(sql, fetchall=True)
 
     def select_event(self, id: str):
-        sql = f"SELECT Name, Date, Time FROM Event WHERE Id = {id}"
+        sql = f"SELECT Name, Date, Time, Place FROM Event WHERE Id = {id}"
         return self.execute(sql, fetchall=True)
 
     def get_amount_of_places(self, id: str):
@@ -43,8 +43,8 @@ class Database:
         return self.execute(sql, fetchone=True)
 
     def get_handled_places(self, id: str):
-        sql = f"SELECT Quantity FROM Booking WHERE Id = {id}"
-        if sql is True:
+        sql = f"SELECT Quantity FROM Booking WHERE Event = {id}"
+        if sql:
             return self.execute(sql, fetchall=True)
         else:
             return "0"

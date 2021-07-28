@@ -14,7 +14,7 @@ async def on_startup(dispatcher):
     await on_startup_notify(dispatcher)
 
     # Убрать нахрен перед релизом
-    db.delete_users()
+    # db.delete_users()
 
 
 if __name__ == '__main__':
