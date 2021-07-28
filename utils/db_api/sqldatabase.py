@@ -75,6 +75,11 @@ class Database:
         parameters = id,
         return self.execute(sql, parameters=parameters, fetchall=True)
 
+    def description(self, id: str):
+        sql = f"""SELECT Comment FROM Event WHERE Id = ?"""
+        parameters = id,
+        return self.execute(sql, parameters=parameters, fetchall=True)
+
 
 def logger(statement):
     print(f"________________________________________________________ \n"
