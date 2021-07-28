@@ -86,9 +86,10 @@ async def my_orders(message: types.Message, state: FSMContext):
             else:
                 minutes: str = str(int(event[0][2]) % 100)
             list_of_orders.append(event[0][0] + '\n' + day + "/" + month
-                                  + " " + str(int(event[0][2]) // 100) + ":" + minutes + '\n' + event[0][3])
+                                  + " " + str(int(event[0][2]) // 100) + ":" + minutes + '\n' + event[0][3]
+                                  + "\n Количество: " + str(orders[i][1]))
             one_event = "\n".join(list_of_orders)
-            order_list.append(one_event + "\n Количество: " + str(orders[i][1]))
+            order_list.append(one_event)
         all_orders = "\n".join(order_list)
         await message.answer(f"Вы забронировали билеты на следующие события: \n"
                              f"{all_orders} \n"
@@ -189,7 +190,7 @@ async def choose_event(message: types.Message, state: FSMContext):
     if message.text.isdigit():
         number = message.text
         data = db.get_list_of_events()
-        if int(number) >= len(data):
+        if int(number) > len(data):
             await message.answer("Такого мероприятия не существует. \n"
                                  "Пожалуйста, введите номер существующего события")
         else:
